@@ -1,0 +1,59 @@
+# This repository ships a flasher and prebuilt images. Everything needed to
+# convert a camera is: README.md, asecam-flash.py, images/.
+#
+# ---------------------------------------------------------------------------
+# NEVER COMMIT: per-device flash dumps.
+# mtd3/mtd4/mtd5 hold per-unit serials, calibration and network config, and the
+# full-flash images contain all of it. They are also the ONLY way back to stock
+# for a given camera -- so keep them safe locally, just not in a repository.
+# ---------------------------------------------------------------------------
+backups/
+readback/
+.stage/
+*_fullflash_*.bin
+*_mtd[0-9]_*.bin
+
+# Build trees (multi-gigabyte, regenerable) -- build from the source repos,
+# see README.md "Building it yourself".
+src/
+output/
+output-*/
+initramfs/root/
+initramfs/init
+initramfs/images.h
+initramfs/.config.production
+
+# Development scratch from the original conversion work. The shipped tool is
+# asecam-flash.py; these are kept locally but are not part of the release.
+flash_net.py
+flash_fh8856.py
+identify.py
+find_cams.py
+tftpd.py
+make_env.py
+rescue_131.py
+env_set_at_prompt.py
+ctel.py
+cssh.py
+uart.sh
+tftproot/
+tools/
+report/
+re/
+patches/
+HANDOFF.md
+REPORT.md
+FULLHAN-SDK-NOTES.md
+openipcissuedraft.md
+
+# Logs, caches, editors
+*.log
+__pycache__/
+*.py[cod]
+.claude/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+flash-pins.jpg
+restore_vendor.py
