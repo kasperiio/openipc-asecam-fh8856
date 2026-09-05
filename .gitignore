@@ -57,3 +57,5 @@ __pycache__/
 .DS_Store
 flash-pins.jpg
 restore_vendor.py
+ramboot_env.py
+cam.py

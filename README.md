@@ -64,12 +64,14 @@ But that is a fact about *who holds the watchdog*, not about network flashing.
 open — so once the vendor userland is gone, **the kernel feeds the watchdog
 forever and the write has no deadline**.
 
-So the vendor side writes exactly one thing: a kernel carrying a small initramfs
-flasher. On reboot that flasher owns the box, asks this tool for its network
-configuration over a broadcast, downloads the real images, and writes rootfs,
-kernel and environment — each read back and byte-compared — before rebooting
-into OpenIPC. It retries indefinitely rather than stranding a camera you cannot
-reach.
+So the vendor side writes two things: the addressing, into the U-Boot
+environment sector — keeping the stock `bootargs`/`bootcmd` byte for byte, so a
+failure after that still boots the stock firmware — and then a kernel carrying a
+small initramfs flasher. On reboot that flasher owns the box, reads its
+addressing back out of the environment, downloads the real images, and writes
+rootfs, kernel and environment — each read back and byte-compared — before
+rebooting into OpenIPC. It retries indefinitely rather than stranding a camera
+you cannot reach.
 
 ---
 
@@ -96,6 +98,31 @@ backdoor on **2360** is gone.
 The image ships **unclaimed**: the first root login runs `openipc-claim`, which
 makes you set a password. divinus streams before you claim, but a shell, SSH and
 RTSP need it.
+
+---
+
+## Updating a camera that is already converted
+
+Do not use the flasher for this — the camera already runs OpenIPC, so it has
+`sysupgrade`, which pivots to a RAM root before writing and needs no UART, no
+TFTP server and no firewall rule:
+
+```bash
+scp -O images/uImage.fh8856v100 images/rootfs.squashfs.fh8856v100 root@<camera>:/tmp/
+```
+```bash
+ssh root@<camera> 'sysupgrade --kernel=/tmp/uImage.fh8856v100 --rootfs=/tmp/rootfs.squashfs.fh8856v100'
+```
+
+`scp -O` matters: the camera's dropbear has no `sftp-server`, and modern `scp`
+speaks SFTP by default.
+
+**Never pass `-n` / `--wipe_overlay`.** It wipes the overlay, which returns the
+camera to unclaimed and drops its root password.
+
+If the WebUI has ever saved settings, `/overlay/etc/divinus.yaml` exists and
+masks the flashed one, so a config change in a new release will not take effect
+until you remove it. Check before assuming an update applied.
 
 ---
 
